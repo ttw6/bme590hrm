@@ -1,0 +1,13 @@
+*.aux
+*.log
+*.out
+*.7z
+.idea
+.cache
+*.synctex.*
+.ipynb_checkpoints
+.DS_Store
+*.fls
+*.fdb_latexmk
+env/
+_build/
