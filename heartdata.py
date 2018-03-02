@@ -1,5 +1,8 @@
 try:
     import logging
+    logging.basicConfig(filename='hrmlog.txt', level=logging.DEBUG,
+                        format='%(asctime)s %(levelname)s %(message)s',
+                        datefmt='%H:%M:%S')
 except ImportError:
     print('Check if running virtual env')
 
@@ -26,16 +29,20 @@ class HeartData:
         self.time = None
         self.voltage = None
         self.filetype = filetype
-
         self.beats = None
         self.mean_hr_bpm = None
         self.num_beats = None
+        self.duration = None
+        self.voltage_extremes = None
+        # Run all if no decorators set-up
+        self.run_fn(time_unit)
 
+    def run_fn(self, time_unit):
         self.read_file()
         self.split_data(time_unit)
-        self.duration = self.calc_duration()
+        self.calc_duration()
         self.calc_mean_hr_bpm()
-        self.voltage_extremes = self.calc_voltage_extremes()
+        self.calc_voltage_extremes()
         self.write_json()
 
     def read_file(self):  # Tried to make modular, but subscriptable error?
@@ -49,9 +56,10 @@ class HeartData:
             logging.error('Check for pandas pkg')
         logging.info('Begin reading file')
         if self.filetype == 'csv':  # more elegant way of checking ext?
-            self.data = pd.read_csv(self.files, delimiter=',', header=None)
+            self.data = pd.read_csv(self.files+'.csv', delimiter=',',
+                                    header=None)
         elif self.filetype == 'json':
-            self.data = pd.read_json(self.files)
+            self.data = pd.read_json(self.files+'.json')
 
     def split_data(self, time_unit):
         """ Splits into time and voltage
@@ -81,10 +89,10 @@ class HeartData:
         :return: HeartData.duration
         """
         try:
-            duration = self.time[-1] - self.time[0]
-            return duration
+            self.duration = self.time[-1] - self.time[0]
+            logging.info('Duration is {} s'.format(self.duration))
         except TypeError:
-            logging.info('Check time data')
+            logging.error('Check time data')
 
     def calc_mean_hr_bpm(self):
         """Finds the peaks using autocorrelation
@@ -99,6 +107,7 @@ class HeartData:
             logging.error('Check numpy and peakutils pkgs')
         # from scipy import signal
         # import matplotlib.pyplot as plt
+        logging.info('Begin autocorrelation calc')
         try:
             avg_volt = np.mean(self.voltage)
             norm = self.voltage - avg_volt
@@ -121,8 +130,9 @@ class HeartData:
 
         :return: HeartData.voltage_extremes
         """
-        voltage_extremes = (min(self.voltage), max(self.voltage))
-        return voltage_extremes
+        self.voltage_extremes = (min(self.voltage), max(self.voltage))
+        logging.info('Min/max  are {} mV respectively'.format(
+            self.voltage_extremes))
 
     def write_json(self):
         """ Write wanted attributes to json file with same name
@@ -136,4 +146,5 @@ class HeartData:
                    'beats': [self.beats]}
         df = pd.DataFrame(data=my_dict)
         df.to_json(self.files + '.json', orient='records')
+        logging.info('Finished converting into json')
         print('{} converted'.format(self.files))

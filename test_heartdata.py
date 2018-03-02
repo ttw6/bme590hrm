@@ -7,7 +7,7 @@ def test_class():
     """
     from heartdata import HeartData
     # Check if data splits into time, voltage
-    test1 = HeartData('test_data/test_data1.csv')
+    test1 = HeartData('test_data/test_data1')
     assert test1.time is not None
     assert test1.voltage is not None
     assert test1.time[9] == 0.025
