@@ -1,0 +1,7 @@
+pytest
+pytest-pep8
+pandas
+numpy
+sphinx
+scipy
+peakutils
