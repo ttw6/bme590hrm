@@ -1,7 +1,7 @@
 # bme590hrm
 Heart Rate Monitor
 
-[![Build Status] (https://travis-ci.org/ttw6/bme590hrm.svg?branch=master)]
+[![Build Status](https://travis-ci.org/ttw6/bme590hrm.svg?branch=master)](https://travis-ci.org/ttw6/bme590hrm)
 
 The class HeartData was created to have the following attributes:
 	-mean_hr_bpm
