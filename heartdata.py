@@ -38,7 +38,7 @@ class HeartData:
         self.voltage_extremes = self.calc_voltage_extremes()
         self.write_json()
 
-    def read_file(self):  # Tried to make modular, but subscriptable error
+    def read_file(self):  # Tried to make modular, but subscriptable error?
         """ Reads data file
 
         :return: HeartData.data
@@ -92,19 +92,26 @@ class HeartData:
         :return: HeartData.beats, HeartData.num_beats, and
         HeartData.mean_hr_bpm
         """
-        import numpy as np
-        import peakutils
+        try:
+            import numpy as np
+            import peakutils
+        except ImportError:
+            logging.error('Check numpy and peakutils pkgs')
         # from scipy import signal
         # import matplotlib.pyplot as plt
-        avg_volt = np.mean(self.voltage)
-        norm = self.voltage - avg_volt
-        doub_autocorr = np.correlate(norm, norm, 'full')
-        autocorr = doub_autocorr[len(doub_autocorr) // 2:]
-        # peak = signal.find_peaks_cwt(autocorr, np.arange(0.1,1))
-        # plt.plot(self.time, autocorr)
-        # plt.show()
-        # over-estimates peaks with find_peaks_cwt. Reference website:
-        # https://blog.ytotech.com/2015/11/01/findpeaks-in-python/
+        try:
+            avg_volt = np.mean(self.voltage)
+            norm = self.voltage - avg_volt
+            doub_autocorr = np.correlate(norm, norm, 'full')
+            autocorr = doub_autocorr[len(doub_autocorr) // 2:]
+            # peak = signal.find_peaks_cwt(autocorr, np.arange(0.1,1))
+            # plt.plot(self.time, autocorr)
+            # plt.show()
+            # over-estimates peaks with find_peaks_cwt. Reference website:
+            # https://blog.ytotech.com/2015/11/01/findpeaks-in-python/
+        except TypeError:
+            logging.error('Check voltage data')
+            
         self.beats = peakutils.indexes(autocorr, thres=0.1, min_dist=100)
         self.num_beats = len(self.beats)
         dur_min = self.duration / 60  # b/c set-up for time to be in seconds
@@ -120,7 +127,7 @@ class HeartData:
 
     def write_json(self):
         """ Write wanted attributes to json file with same name
-        
+
         """
         import pandas as pd
         my_dict = {'mean_hr_bpm': [self.mean_hr_bpm],
