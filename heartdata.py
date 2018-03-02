@@ -111,7 +111,6 @@ class HeartData:
             # https://blog.ytotech.com/2015/11/01/findpeaks-in-python/
         except TypeError:
             logging.error('Check voltage data')
-            
         self.beats = peakutils.indexes(autocorr, thres=0.1, min_dist=100)
         self.num_beats = len(self.beats)
         dur_min = self.duration / 60  # b/c set-up for time to be in seconds

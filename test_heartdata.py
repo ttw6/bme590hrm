@@ -17,4 +17,3 @@ def test_class():
     assert test1.mean_hr_bpm > 0
     assert test1.mean_hr_bpm < 100
     assert type(test1.voltage_extremes) == tuple
-
