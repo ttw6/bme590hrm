@@ -11,4 +11,5 @@ The class HeartData was created to have the following attributes:
 * duration
 * num_beats
 * beats
+
 The user will update the file name and path in the main code, which will call upon the class.
