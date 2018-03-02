@@ -41,7 +41,7 @@ class HeartData:
     def read_file(self):  # Tried to make modular, but subscriptable error
         """ Reads data file
 
-        :return: self.data
+        :return: HeartData.data
         """
         try:
             import pandas as pd
@@ -54,6 +54,11 @@ class HeartData:
             self.data = pd.read_json(self.files)
 
     def split_data(self, time_unit):
+        """ Splits into time and voltage
+
+        :param time_unit: Default is 's'
+        :return: HeartData.time and HeartData.voltage
+        """
         # from loaddata import LoadData
         logging.info('Splitting data into time and voltage')
         try:
@@ -71,10 +76,22 @@ class HeartData:
             logging.error('Check inputs')
 
     def calc_duration(self):
-        duration = self.time[-1] - self.time[0]
-        return duration
+        """ Outputs how long was the test
+
+        :return: HeartData.duration
+        """
+        try:
+            duration = self.time[-1] - self.time[0]
+            return duration
+        except TypeError:
+            logging.info('Check time data')
 
     def calc_mean_hr_bpm(self):
+        """Finds the peaks using autocorrelation
+
+        :return: HeartData.beats, HeartData.num_beats, and
+        HeartData.mean_hr_bpm
+        """
         import numpy as np
         import peakutils
         # from scipy import signal
@@ -94,10 +111,17 @@ class HeartData:
         self.mean_hr_bpm = self.num_beats / dur_min
 
     def calc_voltage_extremes(self):
+        """ Calculates min and max of voltages, outputs tuples
+
+        :return: HeartData.voltage_extremes
+        """
         voltage_extremes = (min(self.voltage), max(self.voltage))
         return voltage_extremes
 
     def write_json(self):
+        """ Write wanted attributes to json file with same name
+        
+        """
         import pandas as pd
         my_dict = {'mean_hr_bpm': [self.mean_hr_bpm],
                    'voltage_extremes': [self.voltage_extremes],
